@@ -1,9 +1,18 @@
 import socket
 import os
-
+import json
 clear = lambda: os.system("cls")
 HOST = '127.0.0.1'  # Standard loopback interface address (localhost)
 PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
+ready = False
+while not ready:
+    with open('names.json', 'r') as f:
+        names = json.load(f)
+        f.close()
+    if not names == {}:
+        ready = True
+    else:
+        continue
 
 x = False
 while True:
@@ -13,11 +22,11 @@ while True:
         conn, addr = s.accept()
         with conn:
             if not x:
-                print('Connected by', addr)
+                print(names.get(addr[0]) + " has connected.")
                 x = True
             while True:
                 data = conn.recv(1024)
                 if not data:
                     break
-                print(addr[0]+" sent "+data.decode())
+                print(names.get(addr[0])+" sent '"+data.decode() + "'")
                 conn.sendall(data)
